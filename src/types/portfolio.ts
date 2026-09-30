@@ -46,6 +46,7 @@ export interface Project {
 export interface Experience {
   id: string;
   company: string;
+  logoUrl?: string;
   role: string;
   location: string;
   startDate: string;

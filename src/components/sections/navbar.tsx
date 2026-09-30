@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Moon, SunMedium } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useSyncExternalStore } from "react";
 
 import { Button } from "@/components/ui/button";
 
@@ -13,8 +14,14 @@ const navItems = [
   { label: "Contact", href: "#contact" },
 ];
 
+const subscribe = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 export function Navbar() {
   const { resolvedTheme, setTheme } = useTheme();
+  const mounted = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
+  const isDark = mounted && resolvedTheme === "dark";
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/80 bg-background/80 backdrop-blur-md">
@@ -36,11 +43,11 @@ export function Navbar() {
             type="button"
             variant="ghost"
             size="sm"
-            aria-label={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            onClick={() => setTheme(isDark ? "light" : "dark")}
             className="rounded-full"
           >
-            {resolvedTheme === "dark" ? <SunMedium className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {isDark ? <SunMedium className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
           <Link href="#contact" className="hidden rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted/50 sm:inline-flex">
             Let&apos;s talk

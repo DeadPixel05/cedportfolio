@@ -44,6 +44,7 @@ export const portfolioDataSchema: z.ZodType<PortfolioData> = z.object({
   experience: z.array(z.object({
     id: z.string().min(1).max(200),
     company: z.string().max(500),
+    logoUrl: z.string().max(2000).optional(),
     role: z.string().max(500),
     location: z.string().max(500),
     startDate: z.string().max(100),

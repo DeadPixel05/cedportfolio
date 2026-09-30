@@ -13,6 +13,7 @@ import type {
   Skill,
   SkillCategory,
   SkillLevel,
+  SocialPlatform,
 } from "@/types/portfolio";
 
 const createId = () =>
@@ -36,6 +37,7 @@ const createEmptyProject = (): Project => ({
 const createEmptyExperience = (): Experience => ({
   id: createId(),
   company: "",
+  logoUrl: "",
   role: "",
   location: "",
   startDate: "",
@@ -50,6 +52,67 @@ const createEmptySkill = (): Skill => ({
   category: "Languages",
   level: "Proficient",
 });
+
+const parseList = (text: string, separator: string) =>
+  text
+    .split(separator)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+const upsertSocialLink = (
+  socialLinks: PortfolioData["profile"]["socialLinks"],
+  platform: SocialPlatform,
+  href: string,
+) => {
+  if (socialLinks.some((link) => link.platform === platform)) {
+    return socialLinks.map((link) =>
+      link.platform === platform ? { ...link, href } : link,
+    );
+  }
+
+  return [
+    ...socialLinks,
+    {
+      platform,
+      label: platform,
+      href,
+      ariaLabel: platform === "Email" ? "Send an email" : `Visit ${platform} profile`,
+    },
+  ];
+};
+
+type ListFieldProps = {
+  values: string[];
+  separator: "," | "\n";
+  onChange: (values: string[]) => void;
+  className: string;
+  rows?: number;
+};
+
+// Keeps the raw text locally so trailing separators aren't stripped while typing.
+function ListField({ values, separator, onChange, className, rows }: ListFieldProps) {
+  const joiner = separator === "," ? ", " : "\n";
+  const [draft, setDraft] = useState(values.join(joiner));
+  const [lastValues, setLastValues] = useState(values);
+
+  if (values !== lastValues) {
+    setLastValues(values);
+    if (parseList(draft, separator).join(joiner) !== values.join(joiner)) {
+      setDraft(values.join(joiner));
+    }
+  }
+
+  const handleChange = (text: string) => {
+    setDraft(text);
+    onChange(parseList(text, separator));
+  };
+
+  return separator === "\n" ? (
+    <textarea value={draft} onChange={(event) => handleChange(event.target.value)} rows={rows} className={className} />
+  ) : (
+    <input value={draft} onChange={(event) => handleChange(event.target.value)} className={className} />
+  );
+}
 
 export default function AdminPage() {
   const { portfolio, setPortfolio, ready, dirty, markSaved } = usePortfolioData();
@@ -82,6 +145,27 @@ export default function AdminPage() {
     setPortfolio((current) => ({
       ...current,
       profile: { ...current.profile, [key]: value },
+    }));
+  };
+
+  const updateEmail = (email: string) => {
+    setPortfolio((current) => ({
+      ...current,
+      profile: {
+        ...current.profile,
+        email,
+        socialLinks: upsertSocialLink(current.profile.socialLinks, "Email", `mailto:${email}`),
+      },
+    }));
+  };
+
+  const updateSocialLink = (platform: SocialPlatform, href: string) => {
+    setPortfolio((current) => ({
+      ...current,
+      profile: {
+        ...current.profile,
+        socialLinks: upsertSocialLink(current.profile.socialLinks, platform, href),
+      },
     }));
   };
 
@@ -280,8 +364,29 @@ export default function AdminPage() {
           <label className="space-y-2 text-sm text-muted-foreground">
             <span>Email</span>
             <input
+              type="email"
               value={portfolio.profile.email}
-              onChange={(event) => updateProfile("email", event.target.value)}
+              onChange={(event) => updateEmail(event.target.value)}
+              className="w-full rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none ring-0 transition focus:border-foreground"
+            />
+          </label>
+          <label className="space-y-2 text-sm text-muted-foreground">
+            <span>GitHub URL</span>
+            <input
+              type="url"
+              value={portfolio.profile.socialLinks.find((link) => link.platform === "GitHub")?.href ?? ""}
+              onChange={(event) => updateSocialLink("GitHub", event.target.value)}
+              placeholder="https://github.com/username"
+              className="w-full rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none ring-0 transition focus:border-foreground"
+            />
+          </label>
+          <label className="space-y-2 text-sm text-muted-foreground">
+            <span>LinkedIn URL</span>
+            <input
+              type="url"
+              value={portfolio.profile.socialLinks.find((link) => link.platform === "LinkedIn")?.href ?? ""}
+              onChange={(event) => updateSocialLink("LinkedIn", event.target.value)}
+              placeholder="https://linkedin.com/in/username"
               className="w-full rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none ring-0 transition focus:border-foreground"
             />
           </label>
@@ -349,28 +454,19 @@ export default function AdminPage() {
                 </label>
                 <label className="space-y-2 text-sm text-muted-foreground md:col-span-2">
                   <span>Stack (comma separated)</span>
-                  <input
-                    value={project.stack.join(", ")}
-                    onChange={(event) =>
-                      updateProject(project.id, {
-                        stack: event.target.value
-                          .split(",")
-                          .map((item) => item.trim())
-                          .filter(Boolean),
-                      })
-                    }
+                  <ListField
+                    values={project.stack}
+                    separator=","
+                    onChange={(stack) => updateProject(project.id, { stack })}
                     className="w-full rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none transition focus:border-foreground"
                   />
                 </label>
                 <label className="space-y-2 text-sm text-muted-foreground md:col-span-2">
                   <span>Impact (one item per line)</span>
-                  <textarea
-                    value={project.impact.join("\n")}
-                    onChange={(event) =>
-                      updateProject(project.id, {
-                        impact: event.target.value.split("\n").map((item) => item.trim()).filter(Boolean),
-                      })
-                    }
+                  <ListField
+                    values={project.impact}
+                    separator={"\n"}
+                    onChange={(impact) => updateProject(project.id, { impact })}
                     rows={4}
                     className="w-full rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none transition focus:border-foreground"
                   />
@@ -429,6 +525,16 @@ export default function AdminPage() {
                   />
                 </label>
                 <label className="space-y-2 text-sm text-muted-foreground">
+                  <span>Company logo URL (optional)</span>
+                  <input
+                    type="url"
+                    value={entry.logoUrl ?? ""}
+                    onChange={(event) => updateExperience(entry.id, { logoUrl: event.target.value })}
+                    placeholder="https://example.com/logo.png"
+                    className="w-full rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none transition focus:border-foreground"
+                  />
+                </label>
+                <label className="space-y-2 text-sm text-muted-foreground">
                   <span>Role</span>
                   <input
                     value={entry.role}
@@ -469,16 +575,10 @@ export default function AdminPage() {
                 </label>
                 <label className="space-y-2 text-sm text-muted-foreground md:col-span-2">
                   <span>Achievements (one item per line)</span>
-                  <textarea
-                    value={entry.achievements.join("\n")}
-                    onChange={(event) =>
-                      updateExperience(entry.id, {
-                        achievements: event.target.value
-                          .split("\n")
-                          .map((item) => item.trim())
-                          .filter(Boolean),
-                      })
-                    }
+                  <ListField
+                    values={entry.achievements}
+                    separator={"\n"}
+                    onChange={(achievements) => updateExperience(entry.id, { achievements })}
                     rows={4}
                     className="w-full rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none transition focus:border-foreground"
                   />
