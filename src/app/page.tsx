@@ -1,5 +1,3 @@
-"use client";
-
 import { Contact } from "@/components/sections/contact";
 import { ExperienceTimeline } from "@/components/sections/experience-timeline";
 import { Footer } from "@/components/sections/footer";
@@ -8,7 +6,7 @@ import { Navbar } from "@/components/sections/navbar";
 import { ProjectCard } from "@/components/sections/project-card";
 import { SkillBadge } from "@/components/sections/skill-badge";
 import { Badge } from "@/components/ui/badge";
-import { usePortfolioData } from "@/lib/portfolio-store";
+import { getPortfolioData } from "@/lib/portfolio-data";
 
 const categoryOrder = [
   "Languages",
@@ -18,8 +16,10 @@ const categoryOrder = [
   "Tools & Testing",
 ] as const;
 
-export default function Home() {
-  const { portfolio } = usePortfolioData();
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const portfolio = await getPortfolioData();
   const { profile, projects, experience, skills } = portfolio;
 
   return (

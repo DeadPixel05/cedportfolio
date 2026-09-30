@@ -1,7 +1,11 @@
 "use client";
 
+import { useState } from "react";
+
 import { portfolioData } from "@/data/portfolio-data";
-import { clonePortfolioData, resetPortfolioData, usePortfolioData } from "@/lib/portfolio-store";
+import { savePortfolioAction } from "@/app/actions/portfolio";
+import { signOutAction } from "@/app/auth/actions";
+import { clonePortfolioData, usePortfolioData } from "@/lib/portfolio-store";
 import type {
   Experience,
   PortfolioData,
@@ -48,7 +52,31 @@ const createEmptySkill = (): Skill => ({
 });
 
 export default function AdminPage() {
-  const { portfolio, setPortfolio, ready } = usePortfolioData();
+  const { portfolio, setPortfolio, ready, dirty, markSaved } = usePortfolioData();
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState("");
+  const [saveError, setSaveError] = useState(false);
+
+  const persistPortfolio = async (nextPortfolio: PortfolioData) => {
+    setIsSaving(true);
+    setSaveMessage("");
+    setSaveError(false);
+    try {
+      const result = await savePortfolioAction(nextPortfolio);
+      if ("error" in result) {
+        setSaveMessage(result.error);
+        setSaveError(true);
+        return;
+      }
+      markSaved();
+      setSaveMessage("Portfolio saved.");
+    } catch {
+      setSaveMessage("The portfolio could not be saved. Try again.");
+      setSaveError(true);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const updateProfile = <K extends keyof PortfolioData["profile"]>(key: K, value: PortfolioData["profile"][K]) => {
     setPortfolio((current) => ({
@@ -137,8 +165,10 @@ export default function AdminPage() {
   };
 
   const resetPortfolio = () => {
-    setPortfolio(clonePortfolioData(portfolioData));
-    resetPortfolioData();
+    if (!window.confirm("Reset the saved portfolio to the starter content?")) return;
+    const resetData = clonePortfolioData(portfolioData);
+    setPortfolio(resetData);
+    void persistPortfolio(resetData);
   };
 
   if (!ready) {
@@ -156,7 +186,7 @@ export default function AdminPage() {
           <p className="text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">Admin</p>
           <h1 className="mt-2 text-4xl font-semibold text-foreground">Portfolio editor</h1>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <button
             type="button"
             onClick={saveToFile}
@@ -166,13 +196,34 @@ export default function AdminPage() {
           </button>
           <button
             type="button"
+            onClick={() => void persistPortfolio(portfolio)}
+            disabled={!dirty || isSaving}
+            className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-4 text-sm font-medium text-background transition-opacity hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isSaving ? "Saving…" : "Save changes"}
+          </button>
+          <button
+            type="button"
             onClick={resetPortfolio}
             className="inline-flex h-11 items-center justify-center rounded-full border border-border bg-transparent px-4 text-sm font-medium text-foreground transition-colors hover:bg-muted/50"
           >
             Reset data
           </button>
+          <form action={signOutAction}>
+            <button
+              type="submit"
+              className="inline-flex h-11 items-center justify-center rounded-full border border-border bg-transparent px-4 text-sm font-medium text-foreground transition-colors hover:bg-muted/50"
+            >
+              Sign out
+            </button>
+          </form>
         </div>
       </div>
+      {saveMessage && (
+        <p className={`mb-6 text-sm ${saveError ? "text-red-600" : "text-muted-foreground"}`} role={saveError ? "alert" : "status"}>
+          {saveMessage}
+        </p>
+      )}
 
       <section className="mb-10 rounded-3xl border border-border bg-card p-6 shadow-sm">
         <h2 className="mb-5 text-2xl font-semibold text-foreground">Profile</h2>

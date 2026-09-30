@@ -1,42 +1,43 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { createContext, createElement, useContext, useState } from "react";
+import type { Dispatch, PropsWithChildren, SetStateAction } from "react";
 
-import { portfolioData } from "@/data/portfolio-data";
 import type { PortfolioData } from "@/types/portfolio";
-
-const STORAGE_KEY = "portfolio-admin-data";
 
 export const clonePortfolioData = (data: PortfolioData): PortfolioData =>
   JSON.parse(JSON.stringify(data)) as PortfolioData;
 
-export function usePortfolioData() {
-  const [portfolio, setPortfolio] = useState<PortfolioData>(clonePortfolioData(portfolioData));
-  const [ready, setReady] = useState(false);
+type PortfolioStoreValue = {
+  portfolio: PortfolioData;
+  setPortfolio: Dispatch<SetStateAction<PortfolioData>>;
+  ready: boolean;
+  dirty: boolean;
+  markSaved: () => void;
+};
 
-  useEffect(() => {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        setPortfolio(JSON.parse(saved) as PortfolioData);
-      } catch {
-        setPortfolio(clonePortfolioData(portfolioData));
-      }
-    }
-    setReady(true);
-  }, []);
+const PortfolioContext = createContext<PortfolioStoreValue | null>(null);
 
-  useEffect(() => {
-    if (ready) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(portfolio));
-    }
-  }, [portfolio, ready]);
+export function PortfolioProvider({
+  initialPortfolio,
+  children,
+}: PropsWithChildren<{ initialPortfolio: PortfolioData }>) {
+  const [portfolio, setPortfolioState] = useState(() => clonePortfolioData(initialPortfolio));
+  const [dirty, setDirty] = useState(false);
+  const setPortfolio: Dispatch<SetStateAction<PortfolioData>> = (next) => {
+    setPortfolioState(next);
+    setDirty(true);
+  };
 
-  return { portfolio, setPortfolio, ready };
+  return createElement(
+    PortfolioContext.Provider,
+    { value: { portfolio, setPortfolio, ready: true, dirty, markSaved: () => setDirty(false) } },
+    children,
+  );
 }
 
-export function resetPortfolioData() {
-  if (typeof window !== "undefined") {
-    window.localStorage.removeItem(STORAGE_KEY);
-  }
+export function usePortfolioData() {
+  const value = useContext(PortfolioContext);
+  if (!value) throw new Error("usePortfolioData must be used within PortfolioProvider.");
+  return value;
 }
