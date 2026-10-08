@@ -4,8 +4,10 @@ import Link from "next/link";
 import { Moon, SunMedium } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useSyncExternalStore } from "react";
+import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 
 const navItems = [
   { label: "Projects", href: "#projects" },
@@ -42,16 +44,21 @@ export function Navbar() {
           <Button
             type="button"
             variant="ghost"
-            size="sm"
+            size="icon"
             aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
             onClick={() => setTheme(isDark ? "light" : "dark")}
             className="rounded-full"
           >
             {isDark ? <SunMedium className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
-          <Link href="#contact" className="hidden rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted/50 sm:inline-flex">
+          <motion.a 
+            href="#contact"
+            className={buttonVariants("outline", "sm", "hidden sm:inline-flex rounded-full px-5")}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
             Let&apos;s talk
-          </Link>
+          </motion.a>
         </div>
       </nav>
     </header>

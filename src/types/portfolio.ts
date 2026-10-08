@@ -38,6 +38,8 @@ export interface Project {
   title: string;
   summary: string;
   problem: string;
+  architecture?: string[];
+  metrics?: string;
   stack: string[];
   impact: string[];
   links: ProjectLink[];

@@ -1,25 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #f9fafb;
+  --foreground: #18181b;
   --card: #ffffff;
-  --muted: #f1f5f9;
-  --muted-foreground: #475569;
-  --primary: #0f172a;
-  --border: rgba(15, 23, 42, 0.12);
-  --ring: rgba(15, 23, 42, 0.18);
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --primary: #18181b;
+  --primary-foreground: #fafafa;
+  --border: rgba(226, 232, 240, 0.8);
+  --ring: rgba(24, 24, 27, 0.18);
 }
 
 .dark {
-  --background: #020817;
-  --foreground: #e2e8f0;
-  --card: #0f172a;
-  --muted: #111827;
-  --muted-foreground: #94a3b8;
-  --primary: #f8fafc;
-  --border: rgba(148, 163, 184, 0.2);
-  --ring: rgba(148, 163, 184, 0.24);
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --primary: #fafafa;
+  --primary-foreground: #09090b;
+  --border: rgba(255, 255, 255, 0.1);
+  --ring: rgba(255, 255, 255, 0.24);
 }
 
 @theme inline {
@@ -29,6 +31,7 @@
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
   --color-border: var(--border);
   --color-ring: var(--ring);
   --font-sans: var(--font-geist-sans);
@@ -43,10 +46,45 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
-  background: rgba(15, 23, 42, 0.16);
+  background: rgba(161, 161, 170, 0.3);
+}
+
+@media print {
+  @page {
+    margin: 1.5cm;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  nav, footer, .no-print, [data-hide-print="true"] {
+    display: none !important;
+  }
+
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  section {
+    page-break-inside: avoid;
+    padding: 1rem 0 !important;
+  }
+
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #555;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

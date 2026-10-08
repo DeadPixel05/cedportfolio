@@ -37,7 +37,7 @@ export default async function Home() {
             <Badge variant="muted">Built with product and engineering focus</Badge>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="flex flex-col gap-16">
             {projects.map((project) => (
               <ProjectCard key={project.id} project={project} />
             ))}

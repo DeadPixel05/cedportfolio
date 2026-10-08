@@ -34,6 +34,8 @@ export const portfolioDataSchema: z.ZodType<PortfolioData> = z.object({
     title: z.string().max(500),
     summary: z.string().max(20000),
     problem: z.string().max(20000),
+    architecture: z.array(z.string().max(5000)).max(100).optional(),
+    metrics: z.string().max(500).optional(),
     stack: z.array(z.string().max(500)).max(100),
     impact: z.array(z.string().max(5000)).max(100),
     links: z.array(z.object({

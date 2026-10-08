@@ -39,6 +39,11 @@ export const portfolioData: PortfolioData = {
         "A data-rich dashboard that helps teams monitor product health, operational trends, and delivery performance across multiple business units.",
       problem:
         "The team was relying on disconnected reports and manual spreadsheet updates, which slowed decisions and made cross-functional visibility inconsistent.",
+      architecture: [
+        "Server-rendered metrics using React Server Components for fast initial paint.",
+        "PostgreSQL optimizations and connection pooling to handle concurrent high-volume reads."
+      ],
+      metrics: "40% Faster TTFB",
       stack: ["Next.js", "TypeScript", "PostgreSQL", "Charting", "REST API"],
       impact: [
         "Reduced reporting time by consolidating multiple views into one operational workflow.",
