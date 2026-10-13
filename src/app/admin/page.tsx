@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { portfolioData } from "@/data/portfolio-data";
 import { savePortfolioAction } from "@/app/actions/portfolio";
@@ -119,6 +119,11 @@ export default function AdminPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [saveError, setSaveError] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const persistPortfolio = async (nextPortfolio: PortfolioData) => {
     setIsSaving(true);
@@ -255,7 +260,7 @@ export default function AdminPage() {
     void persistPortfolio(resetData);
   };
 
-  if (!ready) {
+  if (!ready || !mounted) {
     return (
       <main className="mx-auto max-w-6xl px-4 py-12 text-sm text-muted-foreground sm:px-6 lg:px-8">
         Loading admin editor…
@@ -469,6 +474,15 @@ export default function AdminPage() {
                     onChange={(impact) => updateProject(project.id, { impact })}
                     rows={4}
                     className="w-full rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none transition focus:border-foreground"
+                  />
+                </label>
+                <label className="space-y-2 text-sm text-muted-foreground md:col-span-2">
+                  <span>Image URL (optional)</span>
+                  <input
+                    value={project.imageUrl || ""}
+                    onChange={(event) => updateProject(project.id, { imageUrl: event.target.value })}
+                    className="w-full rounded-xl border border-border bg-background px-3 py-2 text-foreground outline-none transition focus:border-foreground"
+                    placeholder="https://example.com/image.png"
                   />
                 </label>
                 {project.links.map((link, linkIndex) => (

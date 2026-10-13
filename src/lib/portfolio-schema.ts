@@ -38,6 +38,7 @@ export const portfolioDataSchema: z.ZodType<PortfolioData> = z.object({
     metrics: z.string().max(500).optional(),
     stack: z.array(z.string().max(500)).max(100),
     impact: z.array(z.string().max(5000)).max(100),
+    imageUrl: z.string().max(2000).optional(),
     links: z.array(z.object({
       label: z.string().max(200),
       href: z.string().max(2000),

@@ -5,11 +5,14 @@ import type { Profile } from "@/types/portfolio";
 import { Badge } from "@/components/ui/badge";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/fade-in";
 import { MotionLink, MotionA } from "@/components/ui/motion-link";
+import { AnimatedBackground } from "@/components/ui/animated-background";
 
 export function Hero({ profile }: { profile: Profile }) {
   return (
-    <section id="top" className="mx-auto flex min-h-[100dvh] max-w-6xl flex-col justify-center px-4 pt-20 pb-16 sm:px-6 lg:px-8">
-      <StaggerContainer className="max-w-3xl">
+    <section id="top" className="relative isolate flex min-h-[100dvh] w-full flex-col justify-center overflow-hidden px-4 pt-20 pb-16 sm:px-6 lg:px-8">
+      <AnimatedBackground />
+      <div className="mx-auto w-full max-w-6xl">
+        <StaggerContainer className="max-w-3xl">
         <StaggerItem className="mb-8 flex items-center gap-3">
           <Badge variant="glow" className="gap-2 pl-1.5">
             <span className="relative flex h-2 w-2">
@@ -82,6 +85,7 @@ export function Hero({ profile }: { profile: Profile }) {
           ))}
         </StaggerItem>
       </StaggerContainer>
+      </div>
     </section>
   );
 }

@@ -43,6 +43,7 @@ export interface Project {
   stack: string[];
   impact: string[];
   links: ProjectLink[];
+  imageUrl?: string;
 }
 
 export interface Experience {

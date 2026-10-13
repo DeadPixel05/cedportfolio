@@ -19,7 +19,7 @@ export function ProjectCard({ project }: { project: Project }) {
           )}
         </div>
         <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-muted-foreground">
-          {project.links.map((link) => (
+          {project.links.filter(link => link.href.trim() !== "").map((link) => (
             <Link key={link.label} href={link.href} target="_blank" className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground">
               {link.label}
               <ArrowUpRight className="h-4 w-4" />
@@ -27,6 +27,17 @@ export function ProjectCard({ project }: { project: Project }) {
           ))}
         </div>
       </div>
+
+      {project.imageUrl && (
+        <div className="mt-8 relative w-full overflow-hidden rounded-xl border border-border">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img 
+            src={project.imageUrl} 
+            alt={`Screenshot of ${project.title}`} 
+            className="w-full h-auto max-h-[400px] object-cover object-top"
+          />
+        </div>
+      )}
 
       <p className="mt-8 text-lg leading-relaxed text-muted-foreground max-w-3xl">{project.summary}</p>
 
