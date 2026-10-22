@@ -38,10 +38,15 @@ export interface Project {
   title: string;
   summary: string;
   problem: string;
+  featured?: boolean;
+  role?: string;
+  category?: string;
   architecture?: string[];
   metrics?: string;
   stack: string[];
   impact: string[];
+  keyFeatures?: string[];
+  technicalTradeoffs?: string[];
   links: ProjectLink[];
   imageUrl?: string;
 }

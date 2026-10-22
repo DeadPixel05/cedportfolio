@@ -28,34 +28,34 @@ export default async function Home() {
       <main className="flex-1">
         <Hero profile={profile} />
 
-        <section id="projects" className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
-          <div className="mb-8 flex items-end justify-between gap-4">
+        <section id="projects" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mb-10 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
             <div>
-              <p className="text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">Projects</p>
-              <h2 className="mt-2 text-3xl font-semibold text-foreground">Selected work</h2>
+              <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Selected Engineering Work</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Architectural deep-dives and production metrics across full-stack applications</p>
             </div>
-            <Badge variant="muted">Built with product and engineering focus</Badge>
+            <Badge variant="glow" className="text-xs py-1">Featured Case Studies</Badge>
           </div>
 
-          <div className="flex flex-col gap-16">
+          <div className="grid gap-12">
             {projects.map((project) => (
               <ProjectCard key={project.id} project={project} />
             ))}
           </div>
         </section>
 
-        <section id="experience" className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
-          <div className="mb-10">
-            <p className="text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">Experience</p>
-            <h2 className="mt-2 text-3xl font-semibold text-foreground">Career timeline</h2>
+        <section id="experience" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mb-10 border-b border-border pb-6">
+            <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Career & Experience Timeline</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Proven track record of building, scaling, and maintaining software systems</p>
           </div>
           <ExperienceTimeline experience={experience} />
         </section>
 
-        <section id="skills" className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
-          <div className="mb-10">
-            <p className="text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">Skills</p>
-            <h2 className="mt-2 text-3xl font-semibold text-foreground">Capabilities</h2>
+        <section id="skills" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mb-10 border-b border-border pb-6">
+            <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">Technical Competencies</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Core languages, frameworks, infrastructure, and engineering tooling</p>
           </div>
 
           <div className="space-y-8">
@@ -66,8 +66,8 @@ export default async function Home() {
 
               return (
                 <div key={category}>
-                  <h3 className="mb-4 text-lg font-semibold text-foreground">{category}</h3>
-                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <h3 className="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wider">{category}</h3>
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {categorySkills.map((skill) => (
                       <SkillBadge key={skill.name} skill={skill} />
                     ))}

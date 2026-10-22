@@ -30,8 +30,8 @@ export const metadata: Metadata = {
     url: "https://example.com",
   },
   robots: {
-    index: true,
-    follow: true,
+    index: false,
+    follow: false,
   },
 };
 

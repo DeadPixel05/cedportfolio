@@ -18,16 +18,11 @@ export const BentoCard = React.forwardRef<HTMLDivElement, BentoCardProps>(
         whileHover={glowOnHover ? { y: -2 } : undefined}
         transition={{ type: "spring", stiffness: 400, damping: 30 }}
         className={cn(
-          "group relative overflow-hidden rounded-3xl border border-border bg-card p-8 sm:p-10 shadow-sm transition-shadow hover:shadow-md",
+          "group relative overflow-hidden rounded-2xl border border-border bg-card p-6 sm:p-8 transition-colors hover:border-border-strong",
           className
         )}
         {...props}
       >
-        {glowOnHover && (
-          <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent dark:from-white/5" />
-          </div>
-        )}
         <div className="relative z-10">{children}</div>
       </motion.div>
     );
