@@ -28,8 +28,23 @@ export async function savePortfolioAction(value: unknown): Promise<SavePortfolio
   const ownerId = await getOwnerId();
   if (!ownerId) return { error: "Your administrator session has expired. Sign in again." };
 
+  let serializedLength = 0;
+  try {
+    const serialized = JSON.stringify(value);
+    if (typeof serialized !== "string") {
+      return { error: "The portfolio data is invalid or too large to save." };
+    }
+    serializedLength = serialized.length;
+  } catch {
+    return { error: "The portfolio data is invalid or too large to save." };
+  }
+
+  if (serializedLength > 800_000) {
+    return { error: "The portfolio data is invalid or too large to save." };
+  }
+
   const parsed = portfolioDataSchema.safeParse(value);
-  if (!parsed.success || JSON.stringify(value).length > 800_000) {
+  if (!parsed.success) {
     return { error: "The portfolio data is invalid or too large to save." };
   }
 

@@ -1,12 +1,12 @@
 import { redirect } from "next/navigation";
 
 import { PasswordUpdateForm } from "@/components/auth/password-update-form";
-import { getOwnerId } from "@/lib/supabase/owner";
+import { hasPasswordRecoverySession } from "@/lib/supabase/owner";
 
 export const dynamic = "force-dynamic";
 
 export default async function UpdatePasswordPage() {
-  if (!(await getOwnerId())) redirect("/login?resetError=1");
+  if (!(await hasPasswordRecoverySession())) redirect("/login?resetError=1");
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-12 text-foreground">

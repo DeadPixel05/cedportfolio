@@ -72,15 +72,19 @@ export function Hero({ profile }: { profile: Profile }) {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </MotionLink>
               
-              <MotionLink 
-                href={profile.resumeUrl} target="_blank"
-                className={buttonVariants("outline", "lg")}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <FileText className="mr-2 h-4 w-4" />
-                Resume (PDF)
-              </MotionLink>
+              {profile.resumeUrl.trim() !== "" && (
+                <MotionLink 
+                  href={profile.resumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={buttonVariants("outline", "lg")}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  Resume (PDF)
+                </MotionLink>
+              )}
 
               <motion.button 
                 type="button"
@@ -95,21 +99,26 @@ export function Hero({ profile }: { profile: Profile }) {
             </StaggerItem>
 
             <StaggerItem className="mt-12 flex items-center gap-3 text-sm text-muted-foreground">
-              {profile.socialLinks.map((link) => (
-                <Link
-                  key={link.platform}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={link.ariaLabel}
-                  className="group flex items-center gap-2 rounded-lg border border-border bg-card px-3.5 py-1.5 text-xs font-medium transition-colors hover:bg-muted"
-                >
-                  {link.platform === "GitHub" && <Code2 className="h-3.5 w-3.5" />}
-                  {link.platform === "LinkedIn" && <BriefcaseBusiness className="h-3.5 w-3.5" />}
-                  {link.platform === "Email" && <Mail className="h-3.5 w-3.5" />}
-                  <span className="text-foreground group-hover:text-primary">{link.label}</span>
-                </Link>
-              ))}
+              {profile.socialLinks
+                .filter((link) => link.href.trim() !== "")
+                .map((link) => {
+                  const isMailto = link.href.toLowerCase().startsWith("mailto:");
+                  return (
+                    <Link
+                      key={link.platform}
+                      href={link.href}
+                      target={isMailto ? undefined : "_blank"}
+                      rel={isMailto ? undefined : "noopener noreferrer"}
+                      aria-label={link.ariaLabel}
+                      className="group flex items-center gap-2 rounded-lg border border-border bg-card px-3.5 py-1.5 text-xs font-medium transition-colors hover:bg-muted"
+                    >
+                      {link.platform === "GitHub" && <Code2 className="h-3.5 w-3.5" />}
+                      {link.platform === "LinkedIn" && <BriefcaseBusiness className="h-3.5 w-3.5" />}
+                      {link.platform === "Email" && <Mail className="h-3.5 w-3.5" />}
+                      <span className="text-foreground group-hover:text-primary">{link.label}</span>
+                    </Link>
+                  );
+                })}
             </StaggerItem>
           </StaggerContainer>
 
@@ -137,7 +146,7 @@ export function Hero({ profile }: { profile: Profile }) {
 
             <pre data-ui className="text-xs leading-relaxed text-foreground/90 overflow-x-auto space-y-2">
               <code>
-                <span className="text-muted-foreground">// Core Engineer Competencies</span>{'\n'}
+                <span className="text-muted-foreground">{"// Core Engineer Competencies"}</span>{'\n'}
                 <span className="text-blue-500 dark:text-blue-400">const</span> engineer = {'{'}{'\n'}
                 {'  '}name: <span className="text-emerald-600 dark:text-emerald-400">&quot;{profile.name}&quot;</span>,{'\n'}
                 {'  '}role: <span className="text-emerald-600 dark:text-emerald-400">&quot;{profile.role}&quot;</span>,{'\n'}
@@ -145,7 +154,7 @@ export function Hero({ profile }: { profile: Profile }) {
                 {'  '}performance: <span className="text-emerald-600 dark:text-emerald-400">&quot;100/100 Core Web Vitals&quot;</span>,{'\n'}
                 {'  '}a11y: <span className="text-emerald-600 dark:text-emerald-400">&quot;WCAG 2.1 AA Compliant&quot;</span>,{'\n'}
                 {'}'};{'\n'}{'\n'}
-                <span className="text-muted-foreground">// Real-time system health</span>{'\n'}
+                <span className="text-muted-foreground">{"// Real-time system health"}</span>{'\n'}
                 <span className="text-blue-500 dark:text-blue-400">export default</span> <span className="text-blue-500 dark:text-blue-400">async function</span> <span className="text-yellow-600 dark:text-yellow-400">getTelemetry</span>() {'{'}{'\n'}
                 {'  '}<span className="text-blue-500 dark:text-blue-400">return</span> {'{'} uptime: <span className="text-emerald-600 dark:text-emerald-400">&quot;99.99%&quot;</span>, latency: <span className="text-emerald-600 dark:text-emerald-400">&quot;42ms&quot;</span> {'}'};{'\n'}
                 {'}'}

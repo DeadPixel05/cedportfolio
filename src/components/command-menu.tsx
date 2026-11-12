@@ -75,7 +75,7 @@ export function CommandMenu() {
           
           <Command.Group heading="Actions" className="text-xs font-medium text-muted-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 mt-2">
             <Command.Item
-              onSelect={() => runCommand(() => window.open("/resume.pdf", "_blank"))}
+              onSelect={() => runCommand(() => window.open("/resume.pdf", "_blank", "noopener,noreferrer"))}
               className="relative flex cursor-pointer select-none items-center rounded-md px-2 py-2.5 text-sm outline-none aria-selected:bg-muted aria-selected:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
             >
               <FileText className="mr-2 h-4 w-4" />

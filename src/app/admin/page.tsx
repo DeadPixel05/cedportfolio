@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore } from "react";
 
 import { portfolioData } from "@/data/portfolio-data";
 import { savePortfolioAction } from "@/app/actions/portfolio";
@@ -114,16 +114,16 @@ function ListField({ values, separator, onChange, className, rows }: ListFieldPr
   );
 }
 
+const subscribeHydration = () => () => {};
+const getClientHydrated = () => true;
+const getServerHydrated = () => false;
+
 export default function AdminPage() {
   const { portfolio, setPortfolio, ready, dirty, markSaved } = usePortfolioData();
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [saveError, setSaveError] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(subscribeHydration, getClientHydrated, getServerHydrated);
 
   const persistPortfolio = async (nextPortfolio: PortfolioData) => {
     setIsSaving(true);

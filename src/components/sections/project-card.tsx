@@ -38,7 +38,7 @@ export function ProjectCard({ project }: { project: Project }) {
 
           <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-muted-foreground" onClick={(e) => e.stopPropagation()}>
             {project.links.filter(link => link.href.trim() !== "").map((link) => (
-              <Link key={link.label} href={link.href} target="_blank" className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/40 px-3 py-1.5 transition-colors hover:text-foreground hover:bg-muted">
+              <Link key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/40 px-3 py-1.5 transition-colors hover:text-foreground hover:bg-muted">
                 {link.label}
                 <ArrowUpRight className="h-3.5 w-3.5" />
               </Link>
@@ -194,7 +194,7 @@ export function ProjectCard({ project }: { project: Project }) {
                 <span className="text-xs text-muted-foreground">Press Escape or click outside to close</span>
                 <div className="flex items-center gap-3">
                   {project.links.filter(link => link.href.trim() !== "").map((link) => (
-                    <Link key={link.label} href={link.href} target="_blank" className="inline-flex items-center gap-1 text-xs font-semibold text-foreground bg-primary text-primary-foreground px-4 py-2 rounded-lg transition-opacity hover:opacity-90">
+                    <Link key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-foreground bg-primary text-primary-foreground px-4 py-2 rounded-lg transition-opacity hover:opacity-90">
                       {link.label}
                       <ArrowUpRight className="h-3.5 w-3.5" />
                     </Link>

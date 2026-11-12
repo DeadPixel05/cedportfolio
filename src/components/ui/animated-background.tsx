@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
+const subscribe = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 export function AnimatedBackground() {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(subscribe, getClientSnapshot, getServerSnapshot);
 
   // Raw mouse coordinates relative to the viewport
   const mouseX = useMotionValue(0);
@@ -23,7 +27,6 @@ export function AnimatedBackground() {
   const dotShiftY = useTransform(smoothY, [0, 1080], [14, -14]);
 
   useEffect(() => {
-    setMounted(true);
     // Center initially
     mouseX.set(window.innerWidth / 2);
     mouseY.set(window.innerHeight / 2);

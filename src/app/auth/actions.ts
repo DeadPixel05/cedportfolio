@@ -1,8 +1,10 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { hasPasswordRecoverySession, RECOVERY_COOKIE_NAME } from "@/lib/supabase/owner";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type AuthActionState = {
@@ -11,6 +13,22 @@ export type AuthActionState = {
 } | undefined;
 
 const emailSchema = z.email();
+
+function resolveSiteOrigin(): string {
+  const configured = process.env.NEXT_PUBLIC_SITE_URL
+    ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
+  try {
+    const parsed = new URL(configured);
+    if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+      return parsed.origin;
+    }
+  } catch {
+    // Fall back to default local origin when misconfigured.
+  }
+
+  return "http://localhost:3000";
+}
 
 export async function signInAction(_state: AuthActionState, formData: FormData): Promise<AuthActionState> {
   const email = String(formData.get("email") ?? "").trim();
@@ -34,6 +52,9 @@ export async function signInAction(_state: AuthActionState, formData: FormData):
       await supabase.auth.signOut();
       return { error: "Email or password is incorrect." };
     }
+
+    const cookieStore = await cookies();
+    cookieStore.delete(RECOVERY_COOKIE_NAME);
   } catch {
     return { error: "Sign-in is temporarily unavailable. Try again shortly." };
   }
@@ -50,10 +71,9 @@ export async function requestPasswordResetAction(
 
   try {
     const supabase = await createSupabaseServerClient();
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
-      ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+    const siteOrigin = resolveSiteOrigin();
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${siteUrl}/auth/callback?next=%2Fupdate-password`,
+      redirectTo: `${siteOrigin}/auth/callback?next=%2Fupdate-password`,
     });
     if (error) return { error: "Password recovery is temporarily unavailable. Try again shortly." };
   } catch {
@@ -79,15 +99,17 @@ export async function updatePasswordAction(
   if (!ownerId) return { error: "Administrator access is not configured yet." };
 
   try {
-    const supabase = await createSupabaseServerClient();
-    const { data: claims, error: claimsError } = await supabase.auth.getClaims();
-    if (claimsError || claims?.claims?.sub !== ownerId) {
+    if (!(await hasPasswordRecoverySession())) {
       return { error: "This password reset link is invalid or has expired. Request a new one." };
     }
 
+    const supabase = await createSupabaseServerClient();
     const { error } = await supabase.auth.updateUser({ password });
     if (error) return { error: "The password could not be updated. Request a new reset link." };
-    await supabase.auth.signOut();
+
+    const cookieStore = await cookies();
+    cookieStore.delete(RECOVERY_COOKIE_NAME);
+    await supabase.auth.signOut({ scope: "global" });
   } catch {
     return { error: "The password could not be updated. Request a new reset link." };
   }
@@ -97,6 +119,8 @@ export async function updatePasswordAction(
 
 export async function signOutAction() {
   try {
+    const cookieStore = await cookies();
+    cookieStore.delete(RECOVERY_COOKIE_NAME);
     const supabase = await createSupabaseServerClient();
     await supabase.auth.signOut();
   } finally {
