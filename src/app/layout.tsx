@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { CommandMenu } from "@/components/command-menu";
+import { portfolioData } from "@/data/portfolio-data";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,23 +16,41 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+function resolveMetadataBase(): URL {
+  const raw =
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : "http://localhost:3000");
+
+  try {
+    return new URL(raw);
+  } catch {
+    return new URL("http://localhost:3000");
+  }
+}
+
+const defaultTitle = `${portfolioData.profile.name} | ${portfolioData.profile.role}`;
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://example.com"),
+  metadataBase: resolveMetadataBase(),
   title: {
-    default: "Your Name | Software Engineer",
-    template: "%s | Your Name",
+    default: defaultTitle,
+    template: `%s | ${portfolioData.profile.name}`,
   },
-  description: "Portfolio and interactive resume for a software engineer focused on product engineering, frontend systems, and reliable digital experiences.",
-  keywords: ["Software Engineer", "Product Engineer", "Next.js", "Portfolio", "Resume"],
+  description: portfolioData.profile.bio,
+  keywords: ["Software Engineer", "Senior Software Engineer", "Full-Stack Engineer", "Next.js", "TypeScript", "Portfolio", "Resume"],
   openGraph: {
-    title: "Your Name | Software Engineer",
-    description: "Portfolio and interactive resume for a software engineer focused on product engineering and accessible web experiences.",
+    title: defaultTitle,
+    description: portfolioData.profile.bio,
     type: "website",
-    url: "https://example.com",
+    url: "/",
   },
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
   },
 };
 

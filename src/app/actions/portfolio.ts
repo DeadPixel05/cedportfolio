@@ -45,7 +45,10 @@ export async function savePortfolioAction(value: unknown): Promise<SavePortfolio
 
   const parsed = portfolioDataSchema.safeParse(value);
   if (!parsed.success) {
-    return { error: "The portfolio data is invalid or too large to save." };
+    const issue = parsed.error.issues[0];
+    const fieldPath = issue?.path.join(".");
+    const details = issue ? ` (${fieldPath ? `${fieldPath}: ` : ""}${issue.message})` : "";
+    return { error: `The portfolio data is invalid${details}.` };
   }
 
   let saveStage = "client initialization";

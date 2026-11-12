@@ -226,27 +226,33 @@ The portfolio features a fully functional content management system available at
 
 ### Database Schema (`portfolio_documents`)
 
-When Supabase is enabled, all portfolio data is stored in a single JSONB document with full row-level security:
+When Supabase is enabled, all portfolio data is stored in a single JSONB document with strict owner-bound Row-Level Security (`supabase/migrations/20260930000000_create_portfolio_documents.sql`):
 
 ```sql
 CREATE TABLE IF NOT EXISTS public.portfolio_documents (
-  id TEXT PRIMARY KEY,
+  id TEXT PRIMARY KEY CHECK (id = 'main'),
+  owner_id UUID NOT NULL REFERENCES auth.users (id) ON DELETE RESTRICT,
   data JSONB NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- Public read access for portfolio visitors
-CREATE POLICY "Allow public read portfolio_documents"
+CREATE POLICY "Portfolio is publicly readable"
   ON public.portfolio_documents FOR SELECT
+  TO anon, authenticated
   USING (true);
 
--- Write access restricted to authenticated owners
-CREATE POLICY "Allow authenticated owner write portfolio_documents"
-  ON public.portfolio_documents FOR ALL
+-- Write access restricted to verified owners in private.portfolio_admins
+CREATE POLICY "Owner can insert portfolio"
+  ON public.portfolio_documents FOR INSERT
   TO authenticated
-  USING (true)
-  WITH CHECK (true);
+  WITH CHECK (owner_id = (SELECT auth.uid()) AND (SELECT public.is_portfolio_owner()));
+
+CREATE POLICY "Owner can update portfolio"
+  ON public.portfolio_documents FOR UPDATE
+  TO authenticated
+  USING (owner_id = (SELECT auth.uid()) AND (SELECT public.is_portfolio_owner()))
+  WITH CHECK (owner_id = (SELECT auth.uid()) AND (SELECT public.is_portfolio_owner()));
 ```
 
 ---
@@ -278,13 +284,14 @@ npm install
 
 ### 2. Configure Environment Variables (Optional)
 
-Create a `.env.local` file in the root directory:
+Copy `.env.example` to `.env.local` in the root directory:
 
 ```env
 # Optional: Supabase configuration (omit to use local static data)
-NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-supabase-publishable-key
-OWNER_EMAILS=your-email@example.com
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your-project-key
+SUPABASE_OWNER_ID=00000000-0000-0000-0000-000000000000
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
 ### 3. Start Development Server
@@ -379,7 +386,7 @@ The easiest way to deploy this portfolio is using the **Vercel Platform**:
 
 1. Push your repository to GitHub.
 2. Import the project into Vercel.
-3. Configure your Environment Variables (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, and `OWNER_EMAILS`) if using Supabase.
+3. Configure your Environment Variables (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_OWNER_ID`, and `NEXT_PUBLIC_SITE_URL`) if using Supabase.
 4. Deploy! Next.js 16 and Turbopack will automatically build and optimize the edge output.
 
 ---

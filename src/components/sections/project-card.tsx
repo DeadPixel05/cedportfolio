@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Activity, ChevronRight, X, Layers, Cpu, CheckCircle2 } from "lucide-react";
 
@@ -11,6 +12,10 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export function ProjectCard({ project }: { project: Project }) {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [failedImageUrl, setFailedImageUrl] = React.useState<string | null>(null);
+
+  const hasImage = Boolean(project.imageUrl && project.imageUrl.trim() !== "");
+  const isImageVisible = hasImage && failedImageUrl !== project.imageUrl;
 
   return (
     <>
@@ -47,6 +52,22 @@ export function ProjectCard({ project }: { project: Project }) {
         </div>
 
         <p className="mt-6 text-base leading-relaxed text-muted-foreground max-w-3xl">{project.summary}</p>
+
+        {isImageVisible && (
+          <div className="mt-6 relative w-full overflow-hidden rounded-xl border border-border/80 bg-surface/30">
+            <div className="relative aspect-[16/9] sm:aspect-[21/9] w-full max-h-72 sm:max-h-80 overflow-hidden">
+              <Image
+                src={project.imageUrl!}
+                alt={`${project.title} preview`}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1152px"
+                className="object-cover object-top transition-transform duration-500 ease-out group-hover/card:scale-[1.02]"
+                onError={() => setFailedImageUrl(project.imageUrl || null)}
+                unoptimized
+              />
+            </div>
+          </div>
+        )}
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           {project.architecture ? (
@@ -138,6 +159,22 @@ export function ProjectCard({ project }: { project: Project }) {
               </div>
 
               <div className="overflow-y-auto p-6 space-y-6 text-sm">
+                {isImageVisible && (
+                  <div className="relative w-full overflow-hidden rounded-xl border border-border bg-surface/30">
+                    <div className="relative aspect-video w-full max-h-80 overflow-hidden">
+                      <Image
+                        src={project.imageUrl!}
+                        alt={`${project.title} screenshot`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 768px"
+                        className="object-cover object-top"
+                        onError={() => setFailedImageUrl(project.imageUrl || null)}
+                        unoptimized
+                      />
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
                     <Activity className="h-4 w-4 text-accent" /> Problem & Challenge Statement

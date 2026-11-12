@@ -7,14 +7,12 @@ import { buttonVariants } from "@/components/ui/button-variants";
 export interface ButtonProps extends HTMLMotionProps<"button"> {
   variant?: "default" | "outline" | "ghost" | "secondary";
   size?: "default" | "sm" | "lg" | "icon";
-  asChild?: boolean; // Fake asChild for TS compatibility if needed, though we won't use it directly here
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   className,
   variant = "default",
   size = "default",
-  asChild,
   ...props
 }, ref) => {
   return (

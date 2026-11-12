@@ -1,4 +1,3 @@
-import Image from "next/image";
 import type { Experience } from "@/types/portfolio";
 import { Badge } from "@/components/ui/badge";
 

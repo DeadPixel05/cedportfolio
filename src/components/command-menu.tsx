@@ -3,11 +3,14 @@
 import * as React from "react";
 import { Command } from "cmdk";
 import { useRouter } from "next/navigation";
-import { Search, Folder, User, Mail, FileText } from "lucide-react";
+import { useTheme } from "next-themes";
+import { Search, Folder, User, Mail, FileText, SunMoon } from "lucide-react";
+import { portfolioData } from "@/data/portfolio-data";
 
 export function CommandMenu() {
   const [open, setOpen] = React.useState(false);
   const router = useRouter();
+  const { resolvedTheme, setTheme } = useTheme();
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -74,19 +77,28 @@ export function CommandMenu() {
           </Command.Group>
           
           <Command.Group heading="Actions" className="text-xs font-medium text-muted-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 mt-2">
+            {portfolioData.profile.resumeUrl.trim() !== "" && (
+              <Command.Item
+                onSelect={() => runCommand(() => window.open(portfolioData.profile.resumeUrl, "_blank", "noopener,noreferrer"))}
+                className="relative flex cursor-pointer select-none items-center rounded-md px-2 py-2.5 text-sm outline-none aria-selected:bg-muted aria-selected:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                Download Resume
+              </Command.Item>
+            )}
             <Command.Item
-              onSelect={() => runCommand(() => window.open("/resume.pdf", "_blank", "noopener,noreferrer"))}
-              className="relative flex cursor-pointer select-none items-center rounded-md px-2 py-2.5 text-sm outline-none aria-selected:bg-muted aria-selected:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-            >
-              <FileText className="mr-2 h-4 w-4" />
-              Download Resume
-            </Command.Item>
-            <Command.Item
-              onSelect={() => runCommand(() => window.location.href = "mailto:hello@example.com")}
+              onSelect={() => runCommand(() => { window.location.href = `mailto:${portfolioData.profile.email}`; })}
               className="relative flex cursor-pointer select-none items-center rounded-md px-2 py-2.5 text-sm outline-none aria-selected:bg-muted aria-selected:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
             >
               <Mail className="mr-2 h-4 w-4" />
               Contact Me
+            </Command.Item>
+            <Command.Item
+              onSelect={() => runCommand(() => setTheme(resolvedTheme === "dark" ? "light" : "dark"))}
+              className="relative flex cursor-pointer select-none items-center rounded-md px-2 py-2.5 text-sm outline-none aria-selected:bg-muted aria-selected:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+            >
+              <SunMoon className="mr-2 h-4 w-4" />
+              Toggle Theme
             </Command.Item>
             <Command.Item
               onSelect={() => runCommand(() => window.print())}

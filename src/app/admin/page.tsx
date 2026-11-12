@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
+import Image from "next/image";
 
 import { portfolioData } from "@/data/portfolio-data";
 import { savePortfolioAction } from "@/app/actions/portfolio";
@@ -485,6 +486,21 @@ export default function AdminPage() {
                     placeholder="https://example.com/image.png"
                   />
                 </label>
+                {project.imageUrl && project.imageUrl.trim() !== "" && (
+                  <div className="md:col-span-2 space-y-2">
+                    <span className="text-xs text-muted-foreground">Image Preview</span>
+                    <div className="relative aspect-[16/9] max-h-48 w-full max-w-md overflow-hidden rounded-xl border border-border bg-muted/20">
+                      <Image
+                        src={project.imageUrl}
+                        alt={`${project.title || "Project"} preview`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 448px"
+                        className="object-cover object-top"
+                        unoptimized
+                      />
+                    </div>
+                  </div>
+                )}
                 {project.links.map((link, linkIndex) => (
                   <div key={`${project.id}-${link.label}`} className="space-y-2 text-sm text-muted-foreground">
                     <span>{link.label}</span>

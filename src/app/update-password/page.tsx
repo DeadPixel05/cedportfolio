@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { PasswordUpdateForm } from "@/components/auth/password-update-form";
 import { hasPasswordRecoverySession } from "@/lib/supabase/owner";
+
+export const metadata: Metadata = {
+  title: "Update password",
+  robots: { index: false, follow: false },
+};
 
 export const dynamic = "force-dynamic";
 
